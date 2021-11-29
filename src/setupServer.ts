@@ -21,7 +21,9 @@ async function startServer(server: Koa) {
         const serverStarted: Promise<void> = new Promise((resolve) => {
             server.listen(serverPort, resolve);
         });
-
+        server.use(async (ctx) => {
+            ctx.body = "Hello World";
+        });
         await serverStarted;
         console.log(`Server running on port ${serverPort}`);
     } catch (error) {
