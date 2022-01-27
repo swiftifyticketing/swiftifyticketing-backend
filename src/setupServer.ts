@@ -1,6 +1,11 @@
 import Koa from "koa";
 import bodyParser from "koa-bodyparser";
 import koaCors from "koa2-cors";
+import { Server } from "socket.io";
+import http from "http";
+
+import { registerRoutes } from "./routes/index";
+import { global } from "./socket/global";
 
 async function serverSetUp() {
     const server: Koa = new Koa();
@@ -12,20 +17,21 @@ function middleWares(server: Koa) {
     // Share content between frontend and backend
     server.use(bodyParser());
     server.use(koaCors());
+
+    const routes = registerRoutes().routes();
+    server.use(routes);
 }
 
 async function startServer(server: Koa) {
     try {
-        const serverPort = 5000;
+        const PORT = process.env.PORT || 5000;
 
-        const serverStarted: Promise<void> = new Promise((resolve) => {
-            server.listen(serverPort, resolve);
+        const httpServer = new http.Server(server.callback());
+        const io = new Server(httpServer);
+        global(io);
+        httpServer.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
         });
-        server.use(async (ctx) => {
-            ctx.body = "Hello World";
-        });
-        await serverStarted;
-        console.log(`Server running on port ${serverPort}`);
     } catch (error) {
         console.log(error);
         return error;
