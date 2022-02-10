@@ -1,7 +1,7 @@
 import { compare, hash } from "bcryptjs";
 import mongoose from "mongoose";
 
-import { IUser } from "../../interface/user.interface";
+import { IUser } from "../../interface/User.interface";
 
 const userSchema: mongoose.Schema = new mongoose.Schema({
     username: { type: String },
